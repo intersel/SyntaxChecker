@@ -1,7 +1,7 @@
 -----------------------
 Plugin: SyntaxChecker
 -----------------------
-Version: 0.1
+Version: 0.2
 First Released: December 12, 2012
 Author: Everett Griffiths <everett@fireproofsocks.com>
 License: GNU GPLv2 (or later at your option)
@@ -10,7 +10,7 @@ This plugin performs validation checks on your Resources,
 Templates, Chunks, and Template Variables and alerts the 
 user to any errors that are found in the tag syntax.
 
-This is a BETA release! If this plugin errantly prevents 
+This is still a BETA release! If this plugin errantly prevents 
 you from saving your content, then please accept my 
 apologies! Disable the plugin and report a bug with 
 the tag that caused it to choke!  Thanks! 
@@ -25,6 +25,18 @@ on your content while you save it, immediately letting you
 know if a problem was discovered.  This is crucial for 
 MODX sites where clients might be butchering tags or when
 you just need someone to double-check your tag soup.
+
+-----------------------
+How to Use
+-----------------------
+
+Simply install the Addon: the SyntaxChecker plugin will be activated.
+Now when you save Page, Template, or Chunk, any syntax errors will be 
+reported to you (see screenshots below)
+
+If the saving hangs, try clearing out your Log under Reports --> Error Log.
+If the saving still hangs, then perhaps it's a bug (sorry!).  Disable the 
+plugin and report a bug with the problematic text that caused the error.
 
 -----------------------
 Screenshots

@@ -68,6 +68,14 @@ class SyntaxChecker {
 	//------------------------------------------------------------------------------
 	//! Private Functions
 	//------------------------------------------------------------------------------
+	// Just for debugging
+	private function _log($str) {
+		$myFile = "/tmp/modx.txt";
+		$fh = fopen($myFile, 'a') or die("can't open file");
+		fwrite($fh, $str . "\n");
+		fclose($fh);	
+	}
+	
 	/**
 	 * Generates string of length $len that is only spaces.  We use this to white-out
 	 * tags after we've checked them.
@@ -183,6 +191,9 @@ class SyntaxChecker {
 	 * @param	string	$str 
 	 */
 	private function _validate_link($str) {
+		if (empty($str)) {
+			return;
+		}
 		$resource = $this->modx->getObject('modResource', $str);
 		if (!$resource) {
 			$this->errors[] = sprintf( $this->modx->lexicon('resource_does_not_exist'), '[[~'.$str.']]');
@@ -280,9 +291,15 @@ class SyntaxChecker {
 				// ???
 				return;
 			}
+			// Check for empty parameter strings, e.g. &param=``
+			elseif (substr($str, 0 ,2) == '``') {
+				$str = substr($str, 2); // shift off the empty backticks
+			}
 			else {
 				$str = substr($str, 1); // shift off the backtick
+				
 				preg_match('/^[^`]+/i', $str, $matches); // get everything til the closing backtick.
+				
 				if (isset($matches[0])) {
 					// The parameter is matched here
 					//$matches[0];
@@ -512,6 +529,8 @@ class SyntaxChecker {
 
 	//------------------------------------------------------------------------------
 	/**
+	 * THIS IS THE MAIN EVENT!!!
+	 *
 	 * Phase 2 checker: evaluate the tags for their syntax. You MUST run check_integrity
 	 * first before you can run this check_syntax() function.
 	 *
@@ -523,11 +542,21 @@ class SyntaxChecker {
 	
 		// Gotta strip out those nasty "space-like" characters.
 		$content = str_replace(array("\r","\r\n","\n","\t",chr(202),chr(173),chr(0xC2),chr(0xA0) ), ' ', $obj->get($field));
-		$id 		= $obj->get('id');
+	
+		
+		$id = $obj->get('id');
 		$map = $this->get_tag_map($content);
 		
 		if (empty($map)) {
 			return; // No tags!
+		}
+	
+		// Check for any "persona non grata", i.e. "void" tags
+		// e.g. [[~]], [[$]], [[++]], [[+]], [[++]], [[%]]
+		// This is important because we blank them out as we check them.  After this point,
+		// those "void" tags will be considered valid.
+		if ($this->check_voids($content, $id)) {
+			return;
 		}
 		
 		$raw_map = $map; // save a copy
@@ -641,6 +670,36 @@ class SyntaxChecker {
 		
 	}
 
+	//------------------------------------------------------------------------------
+	/**
+	 * Check for "void" tags, e.g. [[~]], [[$]], [[++]], [[+]], [[++]], [[%]]
+	 * We have to do this check up front, not later on.  This is important because we 
+	 * blank them out tags as we check them from the most deeply nested tag outwards.  
+	 * After this point, those "void" tags will be considered valid.
+	 *
+	 * For example:  [[~[[*id]]]] is a valid tag. First pass reduces it to [[~    ]]
+	 * (i.e. it becomes void).  That's ok when WE do it.  It's not ok if it arrives
+	 * on scene as [[~]].
+	 *
+	 * @return true on error
+	 */
+	public function check_voids($content, $id) {
+
+		// Enter just the contents of the tag, omit [[ and ]]
+		$void_tags = array('','~','+','++','$','%');
+		$error_flag = false;
+		
+		foreach ($void_tags as $v) {
+			$v = preg_quote($v);
+			if (preg_match('/\[\[!?'.$v.'\s*\]\]/', $content, $matches)) {
+				$t = $matches[0];
+				$this->errors[] = sprintf($this->modx->lexicon('void_tag'), $t). " Resource $id";
+				$this->simple_errors[] = sprintf($this->modx->lexicon('void_tag'), $t);
+				$error_flag = true;
+			}
+		}
+		return $error_flag;
+	}
 
 	//------------------------------------------------------------------------------
 	/**
