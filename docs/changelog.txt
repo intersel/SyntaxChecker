@@ -1,6 +1,7 @@
 Changelog for SyntaxChecker.
 
-SyntaxChecker 0.1
+
+SyntaxChecker 0.1 - 0.3
 ========================
-- First public release, basic functionality only.
+- Beta releases with basic functionality.
 - See readme.txt for more info.

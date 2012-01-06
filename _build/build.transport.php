@@ -52,7 +52,7 @@ $modx->setLogTarget('ECHO'); echo '<pre>'; flush();
 
 define('PKG_NAME', 'SyntaxChecker');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
-define('PKG_VERSION', '0.2');
+define('PKG_VERSION', '0.3');
 define('PKG_RELEASE', 'beta');
 
 $modx->loadClass('transport.modPackageBuilder', '', false, true);
@@ -148,5 +148,5 @@ $builder->setPackageAttributes(array(
 // Zip up the package
 $builder->pack();
 
-echo '<br/>Package complete. Check your '.MODX_CORE_PATH . 'packages/ directory for the newly created package.';",;
+echo '<br/>Package complete. Check your '.MODX_CORE_PATH . 'packages/ directory for the newly created package.';
 /*EOF*/

@@ -342,22 +342,52 @@ class SyntaxChecker {
 	 */
 	private function _validate_filters($str) {
 		$filters = array();
+		
+		
 		while($str) {
 			preg_match('/^[^=:]+/i', $str, $matches);
 			if (isset($matches[0])) {
-				$filters[] = trim($matches[0]);
+				
+				$this_filter = trim($matches[0]); // store this for messaging.
+				$filters[] = $this_filter;
 				$str = preg_replace('/^'.$matches[0].'/', '', $str);
 				
-				$first_char = substr($tag, 0, 1);
+				$first_char = substr($str, 0, 1);
 				$str = substr($str, 1); // shift off first char
 				
 				if ($first_char == ':') {
 					continue;  // next filter
 				}
-				// any Arguments?
+				// any Arguments?, e.g. 
 				elseif ($first_char == '=') {
-					// any space before the backticks?
-					// TODO
+					$first_char = substr($str, 0, 1);
+					if ($first_char != '`') {
+						// Integers can be passed w/o backticks
+						preg_match('/^[^\s]+/i', $str, $matches);				
+						if (isset($matches[0])) {
+							if(!is_numeric($matches[0])) {
+								$this->errors[] = sprintf( $this->modx->lexicon('output_filter_args_not_quoted'), $this_filter, $matches[0]);
+								$this->simple_errors[] = sprintf( $this->modx->lexicon('output_filter_args_not_quoted'), $this_filter, $matches[0]);			
+							}
+							$str = preg_replace('/^'.$matches[0].'/','', $str); // shave off the param
+						}
+					}
+					// Check for empty parameter strings, e.g. &param=``
+					elseif (substr($str, 0 ,2) == '``') {
+						$str = substr($str, 2); // shift off the empty backticks
+					}
+					else {
+						$str = substr($str, 1); // shift off the backtick
+						
+						preg_match('/^[^`]+/i', $str, $matches); // get everything til the closing backtick.
+						
+						if (isset($matches[0])) {
+							// The parameter is matched here
+							//$matches[0];
+							$str = preg_replace('/^'.$matches[0].'/','', $str); // shave off the param val
+							$str = substr($str, 1); // shift off the closing backtick
+						}
+					}
 				}
 			}
 			// No filter?!?

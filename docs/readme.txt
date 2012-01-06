@@ -1,7 +1,7 @@
 -----------------------
 Plugin: SyntaxChecker
 -----------------------
-Version: 0.2
+Version: 0.3
 First Released: December 12, 2012
 Author: Everett Griffiths <everett@fireproofsocks.com>
 License: GNU GPLv2 (or later at your option)

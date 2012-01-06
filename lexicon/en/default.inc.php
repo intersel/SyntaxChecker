@@ -41,6 +41,7 @@ $_lang['missing_equals'] = '%1$s is missing an equals sign to separate the %2$s 
 $_lang['chunk_does_not_exist'] = 'Chunk does not exist: %s.';
 $_lang['snippet_does_not_exist'] = 'Snippet does not exist: %s.';
 $_lang['output_filter_does_not_exist'] = 'Output Filter does not exist: %s.';
+$_lang['output_filter_args_not_quoted'] = "The '%s' Output Filter's '%s' argument must be quoted with backticks (`).";
 $_lang['resource_does_not_exist'] = 'Resource does not exist: %s.';
 $_lang['lexicon_does_not_exist'] = 'Lexicon Entry does not exist: %s.';
 $_lang['setting_does_not_exist'] = 'Setting does not exist: %s.';
@@ -49,3 +50,5 @@ $_lang['props_must_be_quoted'] = '%1$s\'s %2$s property must be quoted with back
 $_lang['docvar_does_not_exist'] = 'Document Variable or TV does not exist: %s.';
 $_lang['docvar_not_associated'] = 'TV not associated with this template: %s.';
 $_lang['void_tag'] = 'Void tags not allowed: %s.';
+
+
