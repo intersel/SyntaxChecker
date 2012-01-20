@@ -170,14 +170,31 @@ class SyntaxChecker {
 				break;
 				
 			// Any vars associated with this resource?	
-			case 'modResource':
+			case 'modDocument':
+				if (!in_array($str, $this->resource_fields)) {
+					// modTemplateVarResource
+					$TV = $this->modx->getObject('modTemplateVar', array('name'=>$str));
+					if (!$TV) {
+						$this->errors[] = sprintf( $this->modx->lexicon('docvar_does_not_exist'), '[[*'.$str.']]');
+						$this->simple_errors[] = sprintf( $this->modx->lexicon('docvar_does_not_exist'), '[[*'.$str.']]');
+					}
+					else {
+						$TVT = $this->modx->getObject('modTemplateVarTemplate'
+						, array('templateid'=>$obj->get('id'), 'tmplvarid'=> $TV->get('id') ));
+						if (!$TVT) {
+							$this->errors[] = sprintf( $this->modx->lexicon('docvar_not_associated'), '[[*'.$str.']]');
+							$this->simple_errors[] = sprintf( $this->modx->lexicon('docvar_not_associated'), '[[*'.$str.']]');
+						}					
+					}
+				}			
+
 				break;
 				
-			// TVs.  You can't do that here... can you?	
+			// TVs.  Can you put document variables in a TV?
 			default:
 				// Check on a $field basis?
-				$this->errors[] = 'You cannot put document variables in a TV.';
-				$this->simple_errors[] = 'You cannot put document variables in a TV.';
+				//$this->errors[] = 'You cannot put document variables in a TV.'.$class.'<---';
+				//$this->simple_errors[] = 'You cannot put document variables in a TV.'.$class.'<---';
 		}
 	}
 

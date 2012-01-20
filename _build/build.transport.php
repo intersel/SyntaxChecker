@@ -1,7 +1,7 @@
 <?php
 /**
  * SyntaxChecker
- * 4eecff0cf245546f0200004a-4efcab00f245541d7d000046
+ * 4eecff0cf245546f0200004a-4f07534ff2455444d2000043
  * Copyright 2011 by Everett Griffiths <everett@fireproofsocks.com>
  *
  * This is a plugin for MODX 2.2.x, designed to check the tag syntax of MODX
@@ -52,7 +52,7 @@ $modx->setLogTarget('ECHO'); echo '<pre>'; flush();
 
 define('PKG_NAME', 'SyntaxChecker');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
-define('PKG_VERSION', '0.3');
+define('PKG_VERSION', '0.4');
 define('PKG_RELEASE', 'beta');
 
 $modx->loadClass('transport.modPackageBuilder', '', false, true);
