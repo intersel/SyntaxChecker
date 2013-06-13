@@ -28,13 +28,11 @@
  * @package syntaxchecker
  * @subpackage build
  */
-$mtime = microtime();
-$mtime = explode(" ", $mtime);
-$mtime = $mtime[1] + $mtime[0];
-$tstart = $mtime;
-set_time_limit(0);
-
-echo 'Creating Package...';
+// 
+define('PKG_NAME', 'SyntaxChecker');
+define('PKG_NAME_LOWER', strtolower(PKG_NAME));
+define('PKG_VERSION', '0.4');
+define('PKG_RELEASE', 'beta');
 
 if (!defined('MODX_CORE_PATH')) {
 	define('MODX_CORE_PATH', '/Users/everett2/Sites/revo2/html/core/');
@@ -43,24 +41,32 @@ if (!defined('MODX_CONFIG_KEY')) {
 	define('MODX_CONFIG_KEY', 'config');
 }
 
+
+ 
+// Start the stopwatch...
+$mtime = microtime();
+$mtime = explode' ', $mtime);
+$mtime = $mtime[1] + $mtime[0];
+$tstart = $mtime;
+// Prevent global PHP settings from interrupting
+set_time_limit(0); 
+
+echo 'Creating Package...';
+
 // fire up MODX
 require_once( MODX_CORE_PATH . 'model/modx/modx.class.php');
 $modx = new modx();
 $modx->initialize('mgr');
 $modx->setLogLevel(modX::LOG_LEVEL_INFO);
-$modx->setLogTarget('ECHO'); echo '<pre>'; flush();
-
-define('PKG_NAME', 'SyntaxChecker');
-define('PKG_NAME_LOWER', strtolower(PKG_NAME));
-define('PKG_VERSION', '0.4');
-define('PKG_RELEASE', 'beta');
+$modx->setLogTarget('ECHO'); echo '<pre>'; 
+flush();
 
 $modx->loadClass('transport.modPackageBuilder', '', false, true);
 $builder = new modPackageBuilder($modx);
 $builder->createPackage(PKG_NAME_LOWER, PKG_VERSION, PKG_RELEASE);
 $builder->registerNamespace(PKG_NAME_LOWER, false, true, '{core_path}components/' . PKG_NAME_LOWER.'/');
 
-// Get the object to be packaged
+// Get the object(s) to be packaged
 $Plugin = $modx->newObject('modPlugin');
 $Plugin->set('name', PKG_NAME);
 $Plugin->set('description', 'Checks MODX documents, templates, and chunks for invalid syntax and alerts the users to the problems.');
@@ -118,7 +124,6 @@ $attributes = array(
             xPDOTransport::UNIQUE_KEY => array('pluginid','event'),
         ),
     ),
-
 );
 
 $vehicle = $builder->createVehicle($Plugin, $attributes);
