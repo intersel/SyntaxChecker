@@ -1,6 +1,11 @@
 Changelog for SyntaxChecker.
 
 
+0.5
+====
+- Added Unit Testing
+- Added System Setting to disable the pop-up windows.
+
 SyntaxChecker 0.1 - 0.4
 ========================
 - Beta releases with basic functionality, correcting minor errors.

@@ -320,7 +320,7 @@ class SyntaxChecker {
 				if (isset($matches[0])) {
 					// The parameter is matched here
 					//$matches[0];
-					$str = preg_replace('/^'.$matches[0].'/','', $str); // shave off the param val
+					$str = preg_replace('/^'.preg_quote($matches[0],'/').'/','', $str); // shave off the param val
 					$str = substr($str, 1); // shift off the closing backtick
 				}
 			}
@@ -619,7 +619,7 @@ class SyntaxChecker {
 			$indices = array_keys($map);
 			$count = count($indices);
 			$this_index = $map[$indices[0]];
-			for ( $i = 1; $i <= $count; $i++ ) {
+			for ( $i = 1; $i < $count; $i++ ) {
 				$next_index = $map[$indices[$i]];
 				if ($this_index == 'tag_open' && $next_index == 'tag_close') {
 					$tag_len = $indices[$i] - $indices[$i-1] - 2; // 2 for the width of the tag

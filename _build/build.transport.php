@@ -31,11 +31,11 @@
 // 
 define('PKG_NAME', 'SyntaxChecker');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
-define('PKG_VERSION', '0.4');
+define('PKG_VERSION', '0.5');
 define('PKG_RELEASE', 'beta');
 
 if (!defined('MODX_CORE_PATH')) {
-	define('MODX_CORE_PATH', '/Users/everett2/Sites/revo2/html/core/');
+	define('MODX_CORE_PATH', dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/core/');
 }
 if (!defined('MODX_CONFIG_KEY')) {
 	define('MODX_CONFIG_KEY', 'config');
@@ -45,7 +45,7 @@ if (!defined('MODX_CONFIG_KEY')) {
  
 // Start the stopwatch...
 $mtime = microtime();
-$mtime = explode' ', $mtime);
+$mtime = explode (' ', $mtime);
 $mtime = $mtime[1] + $mtime[0];
 $tstart = $mtime;
 // Prevent global PHP settings from interrupting
@@ -127,7 +127,33 @@ $attributes = array(
 );
 
 $vehicle = $builder->createVehicle($Plugin, $attributes);
+$builder->putVehicle($vehicle);
 
+//------------------------------------------------------------------------------
+//! System Settings
+//------------------------------------------------------------------------------
+$attributes = array(
+	xPDOTransport::UNIQUE_KEY => 'key',
+	xPDOTransport::PRESERVE_KEYS => true,
+	xPDOTransport::UPDATE_OBJECT => false,	
+);
+
+$Setting = $modx->newObject('modSystemSetting');
+$Setting->fromArray(array(
+    'key' => 'syntaxchecker.prevent_save',
+    'value' => '1',
+    'xtype' => 'combo-boolean',
+    'namespace' => PKG_NAME_LOWER,
+    'area' => 'default',
+),'',true,true);
+
+$vehicle = $builder->createVehicle($Setting, $attributes);
+$builder->putVehicle($vehicle);
+
+
+//------------------------------------------------------------------------------
+//! Files
+//------------------------------------------------------------------------------
 // Copy over related files
 $vehicle->resolve('file',array(
     'source' => MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER,
@@ -139,6 +165,9 @@ $vehicle->resolve('file',array(
 $builder->putVehicle($vehicle);
 
 
+//------------------------------------------------------------------------------
+//! Docs
+//------------------------------------------------------------------------------
 /* now pack in the license file, readme and setup options */
 $builder->setPackageAttributes(array(
     'license' => file_get_contents(MODX_ASSETS_PATH .'components/'.PKG_NAME_LOWER.'/docs/license.txt'),

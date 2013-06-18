@@ -51,4 +51,5 @@ $_lang['docvar_does_not_exist'] = 'Document Variable or TV does not exist: %s.';
 $_lang['docvar_not_associated'] = 'TV not associated with this template: %s.';
 $_lang['void_tag'] = 'Void tags not allowed: %s.';
 
-
+$_lang['setting_syntaxchecker.prevent_save'] = 'Prevent Save';
+$_lang['setting_syntaxchecker.prevent_save_desc'] = 'The normal behavior is to pop a modal window when a problem is detected, however this also prevents the page from being saved.  Turn this off if the SyntaxChecker plugin is finding too many false positives: error messages will still be sent to the MODX error log and you can use them when you <a href="https://github.com/fireproofsocks/SyntaxChecker/issues">file bugs</a>.';

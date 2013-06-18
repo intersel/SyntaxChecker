@@ -4,7 +4,7 @@
  *
  * Copyright 2011 by Everett Griffiths <everett@fireproofsocks.com>
  *
- * This is a plugin for MODX 2.2.x.  It checks the tag syntax of MODX
+ * This is a plugin for MODX 2.x.  It checks the tag syntax of MODX
  * documents, chunks, templates, and template variables as they are saved
  * and alerts the user on errors.
  *
@@ -37,12 +37,12 @@ if (empty($modx)) {
 
 // TODO: Check cached version?  If the field hasn't changed, no reason to validate it.
 
-require_once(MODX_CORE_PATH . 'components/syntaxchecker/syntaxchecker.class.php');
+require_once MODX_CORE_PATH . 'components/syntaxchecker/syntaxchecker.class.php';
 
 $SyntaxChecker = new SyntaxChecker($modx);
 
 $modx->lexicon->load('syntaxchecker:default');
-$modx->log(xPDO::LOG_LEVEL_ERROR, '[SyntaxChecker] Event:'.$modx->event->name);
+$modx->log(xPDO::LOG_LEVEL_DEBUG, '[SyntaxChecker] Event:'.$modx->event->name);
 
 // Phase 1: Basic Integrity
 switch ($modx->event->name) {
@@ -81,7 +81,9 @@ switch ($modx->event->name) {
 
 // Log Phase 1 Errors
 if (!empty($SyntaxChecker->errors)) {
-	$modx->event->output($SyntaxChecker->get_error_msg()); // to modal window
+    if ($modx->getOption('syntaxchecker.prevent_save','',1)) {
+	   $modx->event->output($SyntaxChecker->get_error_msg()); // to modal window
+    }
 	return '[SyntaxChecker] '. implode("\n", $SyntaxChecker->errors); 	// to the logs
 }
 
@@ -123,7 +125,9 @@ switch ($modx->event->name) {
 
 // Log Phase 2 Errors
 if (!empty($SyntaxChecker->errors)) {
-	$modx->event->output($SyntaxChecker->get_error_msg()); // to modal window
+    if ($modx->getOption('syntaxchecker.prevent_save','',1)) {
+	   $modx->event->output($SyntaxChecker->get_error_msg()); // to modal window
+	}
 	return '[SyntaxChecker] '. implode("\n", $SyntaxChecker->errors); // to the logs
 }
 

@@ -1,23 +1,14 @@
 -----------------------
 Plugin: SyntaxChecker
 -----------------------
-Version: 0.4
-First Released: December 12, 2011
+Version: 0.5
+Released: June, 2013
 Author: Everett Griffiths <everett@fireproofsocks.com>
 License: GNU GPLv2 (or later at your option)
 
 This plugin performs validation checks on your Resources, 
 Templates, Chunks, and Template Variables and alerts the 
 user to any errors that are found in the tag syntax.
-
-This is still a BETA release! If this plugin errantly prevents 
-you from saving your content, then please accept my 
-apologies! Disable the plugin and report a bug with 
-the tag that caused it to choke!  Thanks! 
-
-This plugin is currently heavy-handed: if an error is 
-detected, you will not be able to save your content until
-the error is corrected.
 
 Since MODX often fails silently when its parser can't 
 make sense of errors, this offers a third-party check
@@ -26,17 +17,54 @@ know if a problem was discovered.  This is crucial for
 MODX sites where clients might be butchering tags or when
 you just need someone to double-check your tag soup.
 
+If this plugin errantly prevents you from saving your content, 
+then please accept my apologies! You can disable the pop-up 
+modals by changing the syntaxchecker.prevent_save System Setting
+to "No".  This will stop the windows from appearing, but 
+error messages will still be logged (sorry, there isn't a 
+middle ground due to limitations in the architecture). 
+
+If you are finding lots of false positive error messages in your 
+error logs about incorrect syntax, then please file a bug with 
+relevant text at https://github.com/fireproofsocks/SyntaxChecker/issues
+
+-------------------------
+Installation Instructions
+-------------------------
+Install this via the MODX package manager.
+
+Manual installation requires the following (e.g. if you have 
+downloaded the files from Github):
+
+1. Extract the zipped files to core/components/syntaxchecker 
+(create the directory if it does not exist)
+
+2. Paste the contents of the elements/plugins/plugin.syntaxchecker.php
+into a new MODX plugin.
+
+3. Check the following System Events:
+
+ *	OnBeforeDocFormSave
+ *	OnBeforeChunkFormSave
+ *	OnBeforeTVFormSave
+ *	OnBeforeTempFormSave
+
+4. Save the plugin.
+
+
 -----------------------
 How to Use
 -----------------------
 
-Simply install the Addon: the SyntaxChecker plugin will be activated.
-Now when you save Page, Template, or Chunk, any syntax errors will be 
-reported to you (see screenshots below)
+After installation, the plugin will be active when saving MODX documents,
+templates, and Chunks.  A modal window will pop up if there are problems 
+detected with your tag syntax (see screenshots below).
 
-If the saving hangs, try clearing out your Log under Reports --> Error Log.
-If the saving still hangs, then perhaps it's a bug (sorry!).  Disable the 
-plugin and report a bug with the problematic text that caused the error.
+If saving a page hangs, try clearing out your Log under Reports --> Error Log.
+If the saving still hangs, then perhaps it's a bug (sorry!).  Change the 
+syntaxchecker.prevent_save System Setting to "No", and the report a bug with
+the problematic text that caused the error.  If this is filling up your logs
+too much, then you can disable the plugin.
 
 -----------------------
 Screenshots
@@ -46,20 +74,3 @@ Screenshots
 <img src="https://img.skitch.com/20111217-k2h7purk8up8c3q13n3nf2x1wh.jpg"/>
 <img src="https://img.skitch.com/20111217-kfdg6y214mffdjj9997ek6bpdk.jpg"/>
 
-
-The following checks are performed when you save a Resource,
-Template, Chunk, or TV:
-
-1. Basic integrity check: equal number of '[[' and ']]'
-2. No looping conditions (e.g. where you put [[*content]] inside your content).
-3. Snippets exist?  e.g. [[Waaaayfinder]]
-4. Chunks exist? e.g. [[$mispelled]]
-5. Resources exist?  e.g. [[~123]]
-6. Settings exist? e.g. [[++site_url]]
-7. Document variables exist?  e.g. [[*kontent]]
-8. Property sets exist?  e.g. [[Snippet@myPropSet]]
-9. Output filters exist? e.g. [[Snippet:my_filter]]
-10. Parameters are prefixed with an ampersand?  e.g. [[Snippet? whoops=`xyz`]]
-11. Parameters delineated from the token via a question mark, e.g. [[Snippet &no=`question`]]
-12. Parameter names and values are separated by an equals sign, e.g. [[Snippet &not`equal`]]
-13. When saving a template, ensure that the TVs are assigned to the current template.

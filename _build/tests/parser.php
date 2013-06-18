@@ -1,4 +1,17 @@
 <?php
+/**
+ * To run these tests you must:
+ *
+ * 1. Download the PHP Unit framework.  If you have installed it via PEAR or Composer, you
+ *  can run the tests just by issuing the phpunit command, e.g. phpunit this_file.php
+ *  If you have not been able to install PHP Unit locally using Composer or PEAR, then download
+ *  the PHAR file, and run the test like this:
+ *      php phpunit.phar path/to/this/script.php
+ *
+ * 2. The paths to MODX assume that this file lives inside assets/components/SyntaxChecker/_build/tests/
+ *
+ */
+ 
 define('MODX_API_MODE', true);
 require_once dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/index.php';
 require_once dirname(dirname(dirname(__FILE__))) . '/syntaxchecker.class.php';
@@ -199,13 +212,69 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->Syn->errors = array(); // reset        
     }   
     
+    /**
+     * We can't do too much testing here without a Resource + Template to cross-check
+     */
     public function testDocVars() {
         $template = $this->modx->newObject('modTemplate');
         
         $this->Syn->check_tag_contents('*pagetitle', 'content', $template);
         $this->assertEmpty($this->Syn->errors);
         $this->Syn->errors = array(); // reset
+
+        $this->Syn->check_tag_contents('*doesnotexist', 'content', $template);
+        $this->assertNotEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
     }
+
+    /**
+     * Verify output filters
+     */
+    public function testFilters() {
+        $template = $this->modx->newObject('modTemplate');
+        
+        $this->Syn->check_tag_contents('*pagetitle:ucase', 'content', $template);
+        $this->assertEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
+
+        $this->Syn->check_tag_contents('*pagetitle:doesnotexist', 'content', $template);
+        $this->assertNotEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
+
+        $this->Syn->check_tag_contents('*pub_date:date=`%Y`', 'content', $template);
+        $this->assertEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
+
+        $this->Syn->check_tag_contents('*pub_date:date=`%Y`:md5', 'content', $template);
+        $this->assertEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
+        
+        $this->Syn->check_tag_contents('*pub_date:date=`%Y`:md5:wordwrap=`80`', 'content', $template);
+        $this->assertEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
+    }
+
+    
+    /**
+     * Larger bits
+     */
+    public function testSyntax() {
+        $resource = $this->modx->newObject('modResource');
+        
+        $content = '[[if?
+    &subject=`[[*banner1-img]]`
+    &operator=`isempty`
+    &then=`[[if? &subject=`[[getResourceField? &id=`1` &field=`banner1-img` &processTV=`1`]]` &operator=`isempty` &then=`` &else=`<div class="banners"><a rel="nofollow" href="[[getResourceField? &id=`1` &field=`banner1-url` &processTV=`1`]]" target="_blank"><img class="banners_img" border="0" src="[[getResourceField? &id=`1` &field=`banner1-img` &processTV=`1`]]" alt="[[getResourceField? &id=`1` &field=`banner1-alt` &processTV=`1`]]"/></a></div>`]]`
+    &else=`<div class="banners"><a rel="nofollow" href="[[*banner1-url]]" target="_blank"><img class="banners_img" border="0" src="[[*banner1-img]]" alt="[[*banner1-alt]]"/></a></div>`
+  ]]';
+        
+        $content = '[[test? 
+        &x=`<div class="banners">Something [[*pagetitle]]</div>`]]';
+        $resource->set('content', $content);
+        $this->Syn->check_syntax('Resource','content', $resource);
+        $this->assertEmpty($this->Syn->errors);
+        $this->Syn->errors = array(); // reset
+    }  
     
 }
 ?>
