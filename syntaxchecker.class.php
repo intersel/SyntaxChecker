@@ -17,7 +17,7 @@
  * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * Quip; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+ * SyntaxChecker; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
  * Suite 330, Boston, MA 02111-1307 USA
  *
  * @package syntaxchecker
@@ -484,7 +484,7 @@ class SyntaxChecker {
 	 *		[params]	=> 
 	 * )
 	 *
-	 * @param	string	
+	 * @param	string contents of a tag without an !, e.g. "pagetitle" or "MySnippet? &arg=`one`"
 	 * @param	array
 	 */
 	public function atomize_tag($tag) {
@@ -525,7 +525,7 @@ class SyntaxChecker {
 		if ($first_char == ':') {
 			$tag = substr($tag, 1); // shift off first char
 			preg_match('/^[^?&]+/i', $tag, $matches);
-			print_r($matches);
+			//print_r($matches);
 			if (isset($matches[0])) {
 				$parts['filters'] = trim($matches[0]);
 				$this->_validate_filters($parts['filters']);
@@ -571,6 +571,11 @@ class SyntaxChecker {
 		if ($left_brackets != $right_brackets) {
 			$this->errors[] = sprintf( $this->modx->lexicon('mismatched_brackets'), $field) . " $type $id";
 			$this->simple_errors[] = sprintf( $this->modx->lexicon('mismatched_brackets'), $field);
+		}
+		
+		if($backticks&1) {
+			$this->errors[] = sprintf( $this->modx->lexicon('odd_backticks'), $field) . " $type $id";
+			$this->simple_errors[] = sprintf( $this->modx->lexicon('odd_backticks'), $field);
 		}
 	}
 
@@ -621,7 +626,7 @@ class SyntaxChecker {
 					$full_tag_len = $tag_len + 4; // additional 4 characters for framing brackets
 					$tag = substr ($content , $indices[$i-1] + 2, $tag_len );
 
-					$this->check_tag($tag, $field, $obj); // <-- the magic happens
+					$this->check_tag_contents($tag, $field, $obj); // <-- the magic happens
 				
 					// Update the map: check these ones off our list
 					unset($map[$indices[$i-1]]);
@@ -640,7 +645,8 @@ class SyntaxChecker {
 
 	//------------------------------------------------------------------------------
 	/**
-	 * Check a single tag (without square brackets, and without any nested tags).  
+	 * Check a single tag contents (i.e. everything inside square brackets, and without 
+	 * any nested tags).  
 	 * Input can look like any of the following:
 	 *
 	 *	mySnippet? &param=`something`
@@ -655,9 +661,11 @@ class SyntaxChecker {
 	 * The way this is called should ensure that any nested tags are "whited out"
 	 * before they get here. 
 	 *
-	 * @param	string	$content of a tag, without the framing square brackets.
+	 * @param string $content of a tag, without the framing square brackets.
+	 * @param field e.g. content
+	 * @param object e.g. modResource
 	 */
-	public function check_tag($content, $field, &$obj) {
+	public function check_tag_contents($content, $field, &$obj) {
 			
 		// Strip the exclamation point 
 		$content = preg_replace('/^!/','', $content);
@@ -696,7 +704,7 @@ class SyntaxChecker {
 			// Placeholder or System Setting
 			case '+':
 				$content = substr($content, 1); // shift off first char
-				// System Setting
+				// ++ System Setting
 				if (substr($content, 0, 1) == '+') {
 					$content = substr($content, 1);
 					$parts = $this->atomize_tag($content);
@@ -719,7 +727,7 @@ class SyntaxChecker {
 
 	//------------------------------------------------------------------------------
 	/**
-	 * Check for "void" tags, e.g. [[~]], [[$]], [[++]], [[+]], [[++]], [[%]]
+	 * Check for "void" tags, e.g. [[~]], [[$]], [[++]], [[+]], [[%]]
 	 * We have to do this check up front, not later on.  This is important because we 
 	 * blank them out tags as we check them from the most deeply nested tag outwards.  
 	 * After this point, those "void" tags will be considered valid.
@@ -728,9 +736,11 @@ class SyntaxChecker {
 	 * (i.e. it becomes void).  That's ok when WE do it.  It's not ok if it arrives
 	 * on scene as [[~]].
 	 *
+	 * @param string $content
+	 * @param integer (optional) page id for reporting
 	 * @return true on error
 	 */
-	public function check_voids($content, $id) {
+	public function check_voids($content, $id=0) {
 
 		// Enter just the contents of the tag, omit [[ and ]]
 		$void_tags = array('','~','+','++','$','%');
@@ -798,6 +808,9 @@ class SyntaxChecker {
 	 *	[12]	=> 'tag_open',
 	 *  [20]	=> 'tag_close',
 	 * )
+	 *
+	 * @param string
+	 * @return array
 	 */
 	public function get_tag_map($str) {
 		$map = array();
