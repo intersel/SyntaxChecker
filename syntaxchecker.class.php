@@ -615,13 +615,16 @@ class SyntaxChecker {
 		
 		// We gotta loop through this.  First pass grabs only the non-nested bits.
 		// We keep going through until we've handled all the bits in the $map.
-		while (count($map)) { 		// Loop start
+		$notProcessed = false;
+		while (count($map) && !$notProcessed) { 		// Loop start
 			$indices = array_keys($map);
 			$count = count($indices);
 			$this_index = $map[$indices[0]];
+			$notProcessed=true;
 			for ( $i = 1; $i < $count; $i++ ) {
 				$next_index = $map[$indices[$i]];
 				if ($this_index == 'tag_open' && $next_index == 'tag_close') {
+					$notProcessed = false;
 					$tag_len = $indices[$i] - $indices[$i-1] - 2; // 2 for the width of the tag
 					$full_tag_len = $tag_len + 4; // additional 4 characters for framing brackets
 					$tag = substr ($content , $indices[$i-1] + 2, $tag_len );
