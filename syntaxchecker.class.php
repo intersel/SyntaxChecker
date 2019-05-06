@@ -442,9 +442,9 @@ class SyntaxChecker {
 		$Setting = $this->modx->getOption($str); 
 		//$Setting = $this->modx->getObject('modSystemSetting', array('name'=>$str));
 		if (!$Setting) {
-			$Setting = $this->modx->getObject('modContextSetting', array('name'=>$str));
+			$Setting = $this->modx->getObject('modContextSetting', array('key'=>$str));
 			if (!$Setting) {			
-				$Setting = $this->modx->getObject('modUserSetting', array('name'=>$str));
+				$Setting = $this->modx->getObject('modUserSetting', array('key'=>$str));
 				if (!$Setting) {
 					$this->errors[] = sprintf( $this->modx->lexicon('setting_does_not_exist'), '[[++'.$str.']]');
 					$this->simple_errors[] = sprintf( $this->modx->lexicon('setting_does_not_exist'), '[[++'.$str.']]');
