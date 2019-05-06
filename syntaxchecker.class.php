@@ -401,7 +401,7 @@ class SyntaxChecker {
 						if (isset($matches[0])) {
 							// The parameter is matched here
 							//$matches[0];
-							$str = preg_replace('/^'.$matches[0].'/','', $str); // shave off the param val
+							$str = preg_replace('/^'.preg_quote($matches[0],'/').'/','', $str); // shave off the param val
 							$str = substr($str, 1); // shift off the closing backtick
 						}
 					}
@@ -529,7 +529,7 @@ class SyntaxChecker {
 			if (isset($matches[0])) {
 				$parts['filters'] = trim($matches[0]);
 				$this->_validate_filters($parts['filters']);
-				$tag = trim(preg_replace('/^'.$matches[0].'/', '', $tag));
+				$tag = trim(preg_replace('/^'.preg_quote($matches[0],'/').'/', '', $tag));
 			}
 		}
 		if (!$tag) {
